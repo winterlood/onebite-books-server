@@ -22,7 +22,8 @@ model Book {
   author String
   publisher String
   coverImgUrl String
-  
+
+  searchIndex String @default("")
   reviews Review[]
 }
 

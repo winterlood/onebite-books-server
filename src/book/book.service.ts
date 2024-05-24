@@ -2,33 +2,40 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { removeWhitespace } from 'src/util/remove-whitepsace';
+import { prismaExclude } from 'src/util/prisma-exclude';
 
 @Injectable()
 export class BookService {
   constructor(private prisma: PrismaService) {}
 
   async createBook(createBookDto: CreateBookDto) {
+    const searchIndex = removeWhitespace([
+      createBookDto.title,
+      createBookDto.author,
+      createBookDto.subTitle,
+    ]);
+
     return await this.prisma.book.create({
-      data: createBookDto,
+      data: { ...createBookDto, searchIndex },
+      select: prismaExclude('Book', ['searchIndex']),
     });
   }
 
   async findAllBooks() {
-    return await this.prisma.book.findMany();
+    return await this.prisma.book.findMany({
+      select: prismaExclude('Book', ['searchIndex']),
+    });
   }
 
   async searchBooks(q?: string) {
+    const searchText = q.replace(/\s+/g, '');
     return await this.prisma.book.findMany({
+      select: prismaExclude('Book', ['searchIndex']),
       where: {
         OR: [
           {
-            title: { contains: q },
-          },
-          {
-            author: { contains: q },
-          },
-          {
-            publisher: { contains: q },
+            searchIndex: { contains: searchText, mode: 'insensitive' },
           },
         ],
       },
@@ -36,13 +43,16 @@ export class BookService {
   }
 
   async findRandomBooks() {
-    return await this.prisma.$queryRawUnsafe(
-      `SELECT * FROM "Book" ORDER BY RANDOM() LIMIT 3;`,
-    );
+    const query = `
+    SELECT id, title, "subTitle", description, author, publisher, "coverImgUrl" 
+    FROM "Book" ORDER BY RANDOM() LIMIT 3
+    `;
+    return await this.prisma.$queryRawUnsafe(query);
   }
 
   async findOneBook(id: number) {
     const book = await this.prisma.book.findUnique({
+      select: prismaExclude('Book', ['searchIndex']),
       where: {
         id: id,
       },
@@ -53,12 +63,26 @@ export class BookService {
     return book;
   }
 
-  async updateBook(id: number, updateBookDto: UpdateBookDto) {
-    return await this.prisma.book.update({
+  async updateBook(id: number, dto: UpdateBookDto) {
+    const beforeUpdateData = await this.prisma.book.findUnique({
+      select: prismaExclude('Book', ['searchIndex']),
       where: {
         id: id,
       },
-      data: updateBookDto,
+    });
+
+    const searchIndex = removeWhitespace([
+      dto.title ?? beforeUpdateData.title,
+      dto.author ?? beforeUpdateData.author,
+      dto.subTitle ?? beforeUpdateData.subTitle,
+    ]);
+
+    return await this.prisma.book.update({
+      select: prismaExclude('Book', ['searchIndex']),
+      where: {
+        id: id,
+      },
+      data: { ...dto, searchIndex },
     });
   }
 

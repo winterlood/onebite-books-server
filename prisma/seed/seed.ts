@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { seedData } from './data';
+import { removeWhitespace } from 'src/util/remove-whitepsace';
 const prisma = new PrismaClient();
 
 async function truncateAllTable() {
@@ -30,6 +31,11 @@ async function createSeedData() {
 
   const bookSeedData = seedData.map((book) => {
     delete book.reviews;
+    book['searchIndex'] = removeWhitespace([
+      book.title,
+      book.author,
+      book.subTitle,
+    ]);
     return book;
   });
 
