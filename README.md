@@ -7,7 +7,7 @@ Node.js 20(or LTS) 이상의 버전이 필요합니다. (24.06.03 기준)
 
 ### 1. 코드를 다운로드하세요
 
-이 저장소를 Clone 또는 Fork 하세요
+이 저장소를 Clone 또는 Fork 하세요 (별표도 찍어주시면 정말 감사 ... 👍)
 
 <img width="1483" alt="image" src="https://github.com/winterlood/onebite-books-server/assets/46296754/6e984ada-dc30-46a8-8cf2-abaf4c6feae9">
 
