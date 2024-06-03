@@ -92,3 +92,12 @@ npx prisma studio
 ```
 
 <img width="1222" alt="image" src="https://github.com/winterlood/onebite-books-server/assets/46296754/5c06d9aa-8f8b-4d9d-9763-9408e1724b13">
+
+### 8. API 문서 확인하기
+
+다음 주소로 접속하면 Swagger로 제작된 API 문서를 확인하실 수 있습니다.  
+단 서버가 가동중일 때에만 동작하니 꼭 서버를 가동한 뒤 접속해주세요!
+
+**http://localhost:12345/api**
+
+<img width="1496" alt="image" src="https://github.com/winterlood/onebite-books-server/assets/46296754/e55f176b-8641-4484-bf36-9a3bc7590ac5">
