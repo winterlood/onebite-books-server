@@ -15,7 +15,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     switch (exception.code) {
       case 'P2025': {
         /* Resouuce Not found */
-        const status = HttpStatus.BAD_REQUEST;
+        const status = HttpStatus.NOT_FOUND;
         response.status(status).json({
           statusCode: status,
           message: `${request.url}은 존재하지 않습니다`,

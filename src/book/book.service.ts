@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
+import { PrismaService } from 'src/prisma/prisma.service';
+import { prismaExclude } from 'src/util/prisma-exclude';
+import { removeWhitespace } from 'src/util/remove-whitepsace';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { removeWhitespace } from 'src/util/remove-whitepsace';
-import { prismaExclude } from 'src/util/prisma-exclude';
 
 @Injectable()
 export class BookService {
@@ -64,12 +65,18 @@ export class BookService {
   }
 
   async updateBook(id: number, dto: UpdateBookDto) {
-    const beforeUpdateData = await this.prisma.book.findUnique({
-      select: prismaExclude('Book', ['searchIndex']),
-      where: {
-        id: id,
-      },
-    });
+    const beforeUpdateData = await this.prisma.book
+      .findUnique({
+        select: prismaExclude('Book', ['searchIndex']),
+        where: {
+          id: id,
+        },
+      })
+      .catch((err) => console.log(err));
+
+    if (!beforeUpdateData) {
+      throw new NotFoundException(`${id}번 도서는 존재하지 않습니다`);
+    }
 
     const searchIndex = removeWhitespace([
       dto.title ?? beforeUpdateData.title,
