@@ -1,7 +1,7 @@
 ## 한입 북스(ONE BITE BOOKS)
 
 한 입 크기로 잘라먹는 Next.js 강의에 사용되는 백엔드 서버입니다.  
-Node.js 20(or LTS) 이상의 버전이 필요합니다. (24.06.03 기준)
+Node.js 22(or 그 이상의 LTS) 이상의 버전이 필요합니다. (25.02.21 기준)
 
 ## 시작하기 (Getting Started)
 
@@ -23,11 +23,36 @@ Node.js 20(or LTS) 이상의 버전이 필요합니다. (24.06.03 기준)
 
 Supabase에 가입한 다음 새로운 프로젝트를 생성합니다.
 
-프로젝트 생성이 완료되었다면 Settings 페이지로 이동한 다음  
-좌측 사이드바의 `Configuration > Database` 섹션에서 `Connection String`을 복사합니다.  
-(하단의 그림 자료 참고)
+프로젝트가 생성이 완료되면 다음과 같은 화면이 나타납니다. 이때에도 데이터베이스 등의 프로젝트의 일부 서비스는 아직 생성이 완료되지 않았을 수 있습니다. 이를 확인하려면 아래 그림에 붉은색 박스로 표시된 Project Status를 클릭하면 됩니다. 모든 서비스가 시작되기까지 통상 5~10분 정도의 시간이 소요될 수 있습니다.
 
-<img width="1361" alt="image" src="https://github.com/winterlood/onebite-books-server/assets/46296754/8576abcd-084a-4648-a8a7-7c15adb821a3">
+<img width="452" alt="Image" src="https://github.com/user-attachments/assets/da2de705-5236-4e24-bd9e-4f4a8a62c968" />
+
+모든 서비스의 가동이 완료되면 다음 그림과 같이 “Project Status” 버튼 앞에 초록색 불이 들어오며 추가로 이 버튼을 클릭해 상세 서비스들의 상태를 살펴보면 서비스 이름 앞에 모두 “No issues”라는 텍스트가 표시됩니다.
+
+<img width="452" alt="Image" src="https://github.com/user-attachments/assets/eb9f890a-3497-4580-870c-8042891c79b3" />
+
+Supabase 프로젝트 생성과 해당 프로젝트의 데이터베이스를 비롯한 모든 서비스의 가동이 다 완료되었다면 이제 앞서 다운로드 받은 백엔드 서버와 Supabase 데이터베이스를 연결할 차례입니다.
+
+이 연결은 Connection String 이라는 일종의 주솟값을 통해 이루어지는데 이 주소값은 대시보드 상단의 “Connect” 버튼을 클릭하면 나타나는 모달 창 안에서 확인 가능합니다.
+
+![Image](https://github.com/user-attachments/assets/33c64cd7-36bd-4eeb-b751-398bc0dfd43e)
+
+Connect 버튼을 클릭하면 “Connect to your project” 모달 창이 나타납니다. 여기서 ORMs 탭으로 이동한 후, Tool이 Prisma로 선택되어 있는지 확인합니다.
+
+만약 Prisma가 선택되어 있다면, 그 아래에 커넥션 스트링을 DATABASE_URL과 DIRECT_URL이라는 환경 변수에 저장하는 코드가 표시됩니다. 이 내용을 전체 복사합니다.
+
+![Image](https://github.com/user-attachments/assets/b7fba336-420c-44d4-90e4-12018161e1cd)
+
+복사가 완료되었다면 VSCode에서 앞서 다운로드 받은 백엔드 서버를 열고 프로젝트 루트 아래에 .env 파일을 생성하고 복사한 코드를 이 파일에 붙여넣어 줍니다.
+
+```
+// .env
+# Connect to Supabase via connection pooling with Supavisor.
+DATABASE_URL="postgresql://postgres.uektaydysdsygkomxtuh:[YOUR-PASSWORD]@aws-0-ap-northeast-2.pooler.supabase.com:6543/postgres?pgbouncer=true"
+
+# Direct connection to the database. Used for migrations.
+DIRECT_URL="postgresql://postgres.uektaydysdsygkomxtuh:[YOUR-PASSWORD]@aws-0-ap-northeast-2.pooler.supabase.com:5432/postgres"
+```
 
 복사한 `Connection String`을 `.env` 파일을 생성하여 다음과 같이 붙여넣습니다.
 
@@ -36,16 +61,19 @@ Supabase에 가입한 다음 새로운 프로젝트를 생성합니다.
 DATABASE_URL="방금 복사한 Connection String"
 ```
 
-이때 `Connection String`의 `[YOUR-PASSWORD]` 부분을 자신이 설정한 비밀번호로 수정합니다.
+잘 붙여넣었다면, 이제 DATABASE_URL과 DIRECT_URL 환경 변수에 저장된 각 Connection String 내부의 비밀번호를 수정해야 합니다.
+
+각 변수의 값에서 [YOUR-PASSWORD] 로 표시된 부분을 앞서 설정한 데이터베이스 비밀번호로 변경합니다. 이때 대괄호까지 함께 삭제해야 합니다.
 
 <details>
 <summary><b>비밀번호를 까먹었다면?</b></summary>
 <div markdown="1">
 
-앞서 `Connection String`을 복사한 페이지에서 드래그를 내려보면 아래 그림과 같이 `Reset Password` 버튼을 발견할 수 있습니다.  
-해당 버튼을 클릭해 새로운 비밀번호로 재 설정한 다음 `.env` 파일에 붙여넣습니다.
+앞서 설정해둔 데이터베이스 비밀번호를 까먹었다면 비밀번호를 재 설정해야 합니다.
 
-<img width="1333" alt="image" src="https://github.com/winterlood/onebite-books-server/assets/46296754/effe86fe-8b0d-43a4-9368-6bf2a0b42806">
+비밀번호를 재 설정 하려면 아래 그림에 안내된 순서대로 `Setting 페이지 > Database 탭`으로 접속해 비밀번호 재 설정 버튼을 클릭하면 됩니다.
+
+![Image](https://github.com/user-attachments/assets/1d06837f-d204-4eec-9751-88be3e0473da)
 
 </div>
 </details>
